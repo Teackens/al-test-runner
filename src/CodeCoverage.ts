@@ -5,6 +5,7 @@ import { ALObject, CodeCoverageLine, CodeCoverageObject } from './types';
 import { activeEditor, passingTestDecorationType, outputChannel } from './extension';
 import { join } from 'path';
 import { getTestWorkspaceFolder } from './config';
+import { logDebugChannel } from './debugChannel';
 
 export function updateCodeCoverageDecoration(show: Boolean) {
     if (!activeEditor) {
@@ -125,11 +126,13 @@ function getALObjectsFromCodeCoverage(codeCoverage: CodeCoverageLine[]): ALObjec
     let alObjects: ALObject[] = [];
     let currentObject: ALObject;
     let lastObject: ALObject;
+    logDebugChannel('Reading objects from code coverage')
     codeCoverage.forEach(element => {
         currentObject = getALObjectFromCodeCoverageLine(element);
         if (JSON.stringify(currentObject) != JSON.stringify(lastObject)) {
             lastObject = getALObjectFromCodeCoverageLine(element);
             alObjects.push(lastObject);
+            logDebugChannel(`${lastObject.type} ${lastObject.id}`);
         }
     });
 
