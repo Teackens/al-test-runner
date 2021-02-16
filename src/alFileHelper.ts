@@ -3,6 +3,7 @@ import { ALFile, ALObject } from './types';
 import { alFiles } from './extension';
 import { createReadStream, readFileSync } from 'fs';
 import { createInterface } from 'readline';
+import { logDebugChannel } from './debugChannel';
 
 export function getALObjectOfDocument(document: vscode.TextDocument): ALObject | undefined {
 	let documentText = document.getText(new vscode.Range(0, 0, 1, 0));
@@ -57,11 +58,13 @@ export async function getFilePathByCodeunitId(codeunitId: number, method?: strin
 }
 
 export async function getALFilesInWorkspace(excludePattern: string | undefined): Promise<ALFile[]> {
+	logDebugChannel('Reading AL Files in workspace...');
 	return new Promise(async (resolve) => {
 		let alFiles: ALFile[] = [];
 		const files = await vscode.workspace.findFiles('**/*.al');
 		for (let file of files) {
 			const line = await getFirstLine(file.fsPath);
+			logDebugChannel(`Read '${line}' from ${file.fsPath}`)
 			let positionOfSpace = line.indexOf(' ');
 			let positionOfSecondSpace = line.indexOf(' ', positionOfSpace + 1);
 			let objectName = line.substr(positionOfSecondSpace + 1);
@@ -78,6 +81,7 @@ export async function getALFilesInWorkspace(excludePattern: string | undefined):
 				id: parseInt(line.substring(positionOfSpace + 1, positionOfSecondSpace)),
 				name: objectName
 			};
+			logDebugChannel(`Read ${file} as ${alObject.type} ${alObject.id} ${alObject.name}`);
 			alFiles.push({ object: alObject, path: file.fsPath, excludeFromCodeCoverage: excludePath(file.fsPath, excludePattern) });
 		};
 

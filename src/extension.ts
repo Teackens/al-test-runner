@@ -6,6 +6,7 @@ import { CodelensProvider } from './CodelensProvider';
 import { updateCodeCoverageDecoration, outputCodeCoverage } from './CodeCoverage';
 import { documentIsTestCodeunit, getALFilesInWorkspace, getDocumentIdAndName, getFilePathByCodeunitId } from './alFileHelper';
 import { getTestWorkspaceFolder } from './config';
+import { clearDebugChannel } from './debugChannel';
 
 let terminal: vscode.Terminal;
 export let activeEditor = vscode.window.activeTextEditor;
@@ -224,6 +225,7 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 async function invokeTestRunner(command: string) {
+	clearDebugChannel();
 	const config = getCurrentWorkspaceConfig();
 	getALFilesInWorkspace(config.codeCoverageExcludeFiles).then(files => { alFiles = files});
 
